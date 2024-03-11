@@ -1,0 +1,279 @@
+Program.Sub.ScreenSU.Start
+Gui.F_WODeletions..Create
+Gui.F_WODeletions..Size(6840,5625)
+Gui.F_WODeletions..MinX(6840)
+Gui.F_WODeletions..MinY(5000)
+Gui.F_WODeletions..Position(0,0)
+Gui.F_WODeletions..BackColor(-2147483633)
+Gui.F_WODeletions..MousePointer(0)
+Gui.F_WODeletions..Caption("Mass Deletion of Work Orders")
+Gui.F_WODeletions..Event(UnLoad,F_WODeletions_UnLoad)
+Gui.F_WODeletions.txtFrom.Create(TextBox,"",True,2505,300,0,195,405,True,0,"Arial",8,-2147483643,1)
+Gui.F_WODeletions.txtFrom.Locked(True)
+Gui.F_WODeletions.txtTo.Create(TextBox,"",True,2505,300,0,3495,405,True,0,"Arial",8,-2147483643,1)
+Gui.F_WODeletions.txtTo.Locked(True)
+Gui.F_WODeletions.lblFrom.Create(Label,"From Work Order:",True,1935,255,0,195,195,True,0,"Arial",8,-2147483633,0)
+Gui.F_WODeletions.lblTo.Create(Label,"To Work Order:",True,1935,255,0,3495,195,True,0,"Arial",8,-2147483633,0)
+Gui.F_WODeletions.cmdFrom.Create(Button)
+Gui.F_WODeletions.cmdFrom.Size(375,375)
+Gui.F_WODeletions.cmdFrom.Position(2805,345)
+Gui.F_WODeletions.cmdFrom.Caption("^")
+Gui.F_WODeletions.cmdFrom.Event(Click,cmdFrom_Click)
+Gui.F_WODeletions.cmdTo.Create(Button)
+Gui.F_WODeletions.cmdTo.Size(375,375)
+Gui.F_WODeletions.cmdTo.Position(6105,345)
+Gui.F_WODeletions.cmdTo.Caption("^")
+Gui.F_WODeletions.cmdTo.Event(Click,cmdTo_Click)
+Gui.F_WODeletions.cmdAdd.Create(Button)
+Gui.F_WODeletions.cmdAdd.Size(855,375)
+Gui.F_WODeletions.cmdAdd.Position(255,795)
+Gui.F_WODeletions.cmdAdd.Caption("Add")
+Gui.F_WODeletions.cmdAdd.Event(Click,cmdAdd_Click)
+Gui.F_WODeletions.cmdDelete.Create(Button)
+Gui.F_WODeletions.cmdDelete.Size(1125,375)
+Gui.F_WODeletions.cmdDelete.Position(255,4500)
+Gui.F_WODeletions.cmdDelete.Caption("Delete")
+Gui.F_WODeletions.cmdDelete.Event(Click,cmdDelete_Click)
+Gui.F_WODeletions.ggcRanges.Create(GsGridControl)
+Gui.F_WODeletions.ggcRanges.Size(6210,3105)
+Gui.F_WODeletions.ggcRanges.Position(195,1305)
+Gui.F_WODeletions.ggcRanges.Event(RowCellClick,ggcRanges_RowCellClick)
+Gui.F_WOProgBar..Create
+Gui.F_WOProgBar..Caption("Work order deletion in process.")
+Gui.F_WOProgBar..Size(13545,1575)
+Gui.F_WOProgBar..MinX(0)
+Gui.F_WOProgBar..MinY(0)
+Gui.F_WOProgBar..Position(0,0)
+Gui.F_WOProgBar..BackColor(-2147483637)
+Gui.F_WOProgBar..ControlBox(False)
+Gui.F_WOProgBar..MaxButton(False)
+Gui.F_WOProgBar..MinButton(False)
+Gui.F_WOProgBar..MousePointer(0)
+Gui.F_WOProgBar..Sizeable(False)
+Gui.F_WOProgBar..Enabled(False)
+Gui.F_WOProgBar.pbTIMEOUT.Create(ProgressBar)
+Gui.F_WOProgBar.pbTIMEOUT.Size(12840,330)
+Gui.F_WOProgBar.pbTIMEOUT.Position(210,435)
+Gui.F_WOProgBar.lblRatio.Create(Label,"Label",True,1935,255,0,11115,195,True,1,"Arial",8,-2147483637,0)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+Gui.F_WODeletions.cmdAdd.Anchor(5)
+Gui.F_WODeletions.lblFrom.Anchor(5)
+Gui.F_WODeletions.lblTo.Anchor(5)
+Gui.F_WODeletions.cmdFrom.Anchor(5)
+Gui.F_WODeletions.cmdTo.Anchor(5)
+Gui.F_WODeletions.cmdFrom.Anchor(5)
+Gui.F_WODeletions.txtFrom.Anchor(5)
+Gui.F_WODeletions.txtTo.Anchor(5)
+Gui.F_WODeletions.ggcRanges.Anchor(15)
+Gui.F_WODeletions.cmdDelete.Anchor(6)
+
+F.ODBC.Connection!con.OpenConnection(V.Ambient.PDSN, v.Ambient.PUser, V.Ambient.PPass)
+
+'Create data Table with columns From:, To: and Remove button
+F.Data.DataTable.Create("WORanges", True)
+F.Data.DataTable.AddColumn("WORanges", "From:", String)
+F.Data.DataTable.AddColumn("WORanges", "To:", String)
+F.Data.DataTable.AddColumn("WORanges", "Remove", String)
+
+F.Data.DataView.Create("WORanges", "Display")
+Gui.F_WODeletions.ggcRanges.AddGridviewFromDataview("RangeView", "WORanges", "Display")
+
+Gui.F_WODeletions.ggcRanges.SetColumnProperty("RangeView", "From:", "ReadOnly", True)
+Gui.F_WODeletions.ggcRanges.SetColumnProperty("RangeView", "To:", "ReadOnly", True)
+Gui.F_WODeletions.ggcRanges.SetColumnProperty("RangeView", "Remove", "ReadOnly", True)
+Gui.F_WODeletions.ggcRanges.SetColumnProperty("RangeView", "Remove", "AllowEdit", False)
+Gui.F_WODeletions.ggcRanges.SetColumnProperty("RangeView", "Remove", "Caption", "-")
+Gui.F_WODeletions.ggcRanges.ColumnEdit("RangeView", "Remove", "EditorButton", "Remove")
+
+Gui.F_WODeletions.ggcRanges.MainView("RangeView")
+
+'Set up grid so that the only available column to click on is the remove column.
+
+Gui.F_WODeletions..Show
+
+Program.Sub.Main.End
+
+Program.Sub.cmdFrom_Click.Start
+V.Local.sRet.Declare(String)
+V.Local.sTitle.Declare(String)
+V.Local.iWidth.Declare(Long)
+V.Local.sWO.Declare(String)
+
+f.Intrinsic.UI.SetBrowserHotTypeAhead(true)
+
+f.Intrinsic.String.Split("Job*!*Suffix*!*Desc*!*Part*!*Date Due","*!*",v.Local.sTitle)
+f.Intrinsic.String.Split("1500*!*1000*!*2000*!*1500*!*1500","*!*",v.Local.iWidth)
+
+'Create browser for the From Work Order textbox.
+F.Intrinsic.UI.Browser("Select A Work Order","con","Select Job,Suffix,Description,Part,Date_Due From V_Job_Header",v.Local.sTitle,v.Local.iWidth,v.Local.sRet) 
+F.Intrinsic.Control.If(v.Local.sRet.Trim,<>,"***CANCEL***") 
+	F.Intrinsic.String.Split(v.Local.sret,"*!*",v.Local.sRet) 
+	F.Intrinsic.String.Build("{0}-{1}", V.Local.sRet(0).Trim, V.Local.sRet(1).Trim, V.Local.sWO)
+	Gui.F_WODeletions.txtFrom.Text(V.Local.sWO)
+	Gui.F_WODeletions.txtTo.Text(V.Local.sWO)	
+Function.Intrinsic.Control.Else 
+	Gui.F_WODeletions.txtFrom.Text("")
+	Gui.F_WODeletions.txtTo.Text("")
+Function.Intrinsic.Control.EndIf
+
+'Print the Work Order in both textboxes.
+
+Program.Sub.cmdFrom_Click.End
+
+Program.Sub.cmdTo_Click.Start
+'Create browser for the To Work Order Textbox. Have it start from the work order on textbox
+
+V.Local.sRet.Declare(String)
+V.Local.sTitle.Declare(String)
+V.Local.iWidth.Declare(Long)
+V.Local.sWO.Declare(String)
+V.Local.sSql.Declare(String)
+
+f.Intrinsic.UI.SetBrowserHotTypeAhead(true)
+
+f.Intrinsic.String.Split("Job*!*Suffix*!*Desc*!*Part*!*Date Due","*!*",v.Local.sTitle)
+f.Intrinsic.String.Split("1500*!*1000*!*2000*!*1500*!*1500","*!*",v.Local.iWidth)
+
+V.Local.sWO.Set(V.Screen.F_WODeletions!txtFrom.Text)
+F.Intrinsic.Control.If(V.Local.sWO.Trim, <>, "")
+	F.Intrinsic.String.Split(V.Local.sWO, "-", V.Local.sWO)
+	F.Intrinsic.String.Build("Select Job,Suffix,Description,Part,Date_Due From V_Job_Header where RTrim(Job)+RTrim(Suffix) >= '{0}'+'{1}'", V.Local.sWO(0).Trim, V.Local.sWO(1).Trim, V.Local.sSql)
+	F.Intrinsic.UI.Browser("Select A Work Order","con",V.Local.sSql,v.Local.sTitle,v.Local.iWidth,v.Local.sRet) 
+	F.Intrinsic.Control.If(v.Local.sRet.Trim,<>,"***CANCEL***") 
+		F.Intrinsic.String.Split(v.Local.sret,"*!*",v.Local.sRet) 
+		F.Intrinsic.String.Build("{0}-{1}", V.Local.sRet(0).Trim, V.Local.sRet(1).Trim, V.Local.sWO)
+		Gui.F_WODeletions.txtTo.Text(V.Local.sWO)	
+	Function.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+'Print the Work Order in both textboxes.
+
+Program.Sub.cmdTo_Click.End
+
+Program.Sub.cmdAdd_Click.Start
+'Check to see if any work order in textboxes falls in any range already selected.
+V.Local..BulkDeclareString(sFromWO, sToWO)
+
+V.Local.sFromWO.Set(V.Screen.F_WODeletions!txtFrom.Text)
+V.Local.sToWO.Set(V.Screen.F_WODeletions!txtTo.Text)
+
+F.Intrinsic.Control.If(V.Local.sFromWO.Trim, =, "")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.ElseIf(V.Local.sToWO.Trim, =, "")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.AddRow("WORanges", "From:", V.Local.sFromWO.Trim, "To:", V.Local.sToWO, "Remove", "Remove")
+
+Gui.F_WODeletions.txtFrom.Text("")
+Gui.F_WODeletions.txtTo.Text("")
+
+Program.Sub.cmdAdd_Click.End
+
+Program.Sub.cmdDelete_Click.Start
+V.Local..BulkDeclareString(sRet, sSql, sFromWO, sToWO, sParams, sWO, sSuff)
+V.Local.iCount.Declare(Long)
+V.Local.iMax.Declare(Long)
+
+'Generate message box to confirm deletion
+F.Intrinsic.UI.Msgbox("Are you sure you would like to delete the work orders that fall in the ranges listed?", "Delete bulk of Work Orders", 4, V.Local.sRet)
+
+F.Intrinsic.Control.If(V.Local.sRet, <>, 6)
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+Gui.F_WODeletions..Visible(False)
+
+F.Data.DataTable.Create("WorkOrders", True)
+F.Data.DataTable.AddColumn("WorkOrders", "Job", "String")
+F.Data.DataTable.AddColumn("WorkOrders", "Suffix", "String")
+
+F.Intrinsic.Control.For(V.Local.iCount, 0, V.DataTable.WORanges.RowCount--, 1)
+	F.Intrinsic.String.Split(V.DataTable.WORanges(V.Local.iCount).From:!FieldValTrim, "-", V.Local.sFromWO)
+	F.Intrinsic.String.Split(V.DataTable.WORanges(V.Local.iCount).To:!FieldValTrim, "-", V.Local.sToWO)
+	F.Intrinsic.String.Build("Select RTrim(Job) as Job, RTrim(Suffix) as Suffix from V_Job_Header where date_closed = '1900-01-01' and (AMT_MATERIAL + AMT_LABOR + AMT_OVERHEAD)=0 and RTrim(Job)+RTrim(Suffix) between '{0}'+'{1}' and '{2}'+'{3}' ", V.Local.sFromWO(0).Trim, V.Local.sFromWO(1).Trim, V.Local.sToWO(0).Trim, V.Local.sToWO(1).Trim, V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("Temp", "con", V.Local.sSql)
+	F.Data.DataTable.Merge("Temp", "WorkOrders", True, 1)
+	F.Data.DataTable.Close("Temp")	
+F.Intrinsic.Control.Next(V.Local.iCount)
+
+F.Data.DataTable.AddExpressionColumn("WorkOrders", "JOBSUFF", "String", "Job + Suffix")
+
+F.Data.DataView.Create("WorkOrders", "WOView")
+F.Data.DataView.ToDataTableDistinct("WorkOrders", "WOView", "Final", "JOBSUFF*!*JOB*!*SUFFIX")
+
+'Distinct Work Orders/suffix are now stored in "Final" table. Just need to loop through the entire table and delete each line with a callwrapper.
+'Depending on the size of the table, this may be a long process..
+
+V.Local.iMax.Set(V.DataTable.Final.RowCount)
+V.Local.sSql.Set(" out of ")
+Gui.F_WOProgBar.pbTIMEOUT.Min(0)
+Gui.F_WOProgBar.pbTIMEOUT.Max(V.Local.iMax)
+
+Gui.F_WOProgBar..Show
+
+F.Intrinsic.Control.For(V.Local.iCount, 0, V.DataTable.Final.RowCount--, 1)
+	F.Intrinsic.String.Build("{0}{1}{2} deleted", V.Local.iCount, V.Local.sSql, V.Local.iMax, V.Local.sRet)
+	Gui.F_WOProgBar.lblRatio.Text(V.Local.sRet)
+	Gui.F_WOProgBar.pbTIMEOUT.Value(V.Local.iCount)
+	'Get Work Order/suffix from DataTable "Final" line V.L.iCount
+	
+	V.Local.sWO.Set(V.DataTable.Final(V.Local.iCount).JOB!FieldValTrim)
+	V.Local.sSuff.Set(V.DataTable.Final(V.Local.iCount).SUFFIX!FieldValTrim)
+	
+	'if the suffix is blank set it as ZDR
+	f.Intrinsic.Control.If(v.Local.sSuff.Trim,=,"")
+'		v.Local.sSuff.Set("ZDR")
+	f.Intrinsic.Control.EndIf
+	
+	'We will be deleting a single work order at a time
+	F.Intrinsic.String.Build("{0}!*!{1}!*!{0}!*!{1}", V.Local.sWO.Trim, V.Local.sSuff.trim, V.Local.sParams)
+
+	'Use callwrapper to delete work order
+	F.Global.General.CallWrapperSync(2070, V.Local.sParams)
+F.Intrinsic.Control.Next(V.Local.iCount)
+
+gui.F_WOProgBar..Visible(False)
+
+F.Intrinsic.UI.Msgbox("Bulk work order deletion process complete", "Ending program")
+
+F.Intrinsic.Control.CallSub(f_wodeletions_unload)
+
+Program.Sub.cmdDelete_Click.End
+
+Program.Sub.F_WODeletions_UnLoad.Start
+'Close everything
+F.Intrinsic.Control.End
+
+Program.Sub.F_WODeletions_UnLoad.End
+
+Program.Sub.ggcRanges_RowCellClick.Start
+V.Local.iRow.Declare(Long)
+
+'Check if they clicked on remove. If so, delete the row from the Data Table
+F.Intrinsic.Control.If(V.Args.Column, =, "Remove")
+	V.Local.iRow.Set(V.Args.RowHandle)
+	F.Data.DataTable.DeleteRow("WORanges", V.Local.iRow)
+F.Intrinsic.Control.EndIf
+Program.Sub.ggcRanges_RowCellClick.End
+
+Program.Sub.Comments.Start
+${$0$}$GCG_4356_PayrollExport$}$FEQ$}$2/15/2017 3:10:36 PM$}$False
+${$2$}$$}$$}$0$}$3$}$ORD1FRTV$}$2/16/2017 7:29:01 AM$}$We are calling the World Ship program to get these additional Freight added to the shipment before the order goes to be invoiced.  
+
+You should be able to use the existing core module ORD1FRTV which is used by the  
+old WorldShip interface to add freight to shipments. After the shipment is selected to invoice, you would call this module to update/add freight to the shipment. The parameters must be passed in the specified order with the exact number of characters with no delimiters between. The parameter string is as follows: 
+
+cccooooooossssaaaaaaaaaaaaccccccccccccm 
+
+ccc is the Company code, ooooooo is the Order Number, ssss is the Shipment Sequence, aaaaaaaaaaaa is the freight charge (the decimal is implied with 10 digits before the decimal and 2 digits after), cccccccccccc is the freight cost (the decimal is implied with 10 digits before the decimal and 2 digits after), and m is the suppress message flag (a value of "Y" will suppress any error messages). As you are running from a screen hook, I would not suppress messages. The total length of the parameter string is 39 characters. Here is an example: 
+
+INF00948570000000000002500000000001500N 
+
+where the company is INF, the order is 0094857, the shipment sequence is 0000, the freight amount is 0000000000002500 (representing 25.00), the freight cost is 000000001500 (representing 15.00), and messages are not suppressed.
+${$3$}$0$}$$}$0$}$-1$}$$}$12:00:00 AM$}$This will be a custom GAB script that will run from a custom Menu Item under Bill of Material -> File -> Custom Cobalt BOM Import.  The user will navigate to the xml file that needs to be loaded into Global Shop.  Once the xml is parsed there will be a search in Global Shop to see if a BOM already exists for that Part Number.  If one already exists a compare screen will display showing the differences between the two.  If one does not exist then the screen will display the BOM as it will be uploaded into Global Shop.  Any parts that are listed in the BOM that are not Inventory Parts will be highlighted in Yellow.  If there are any parts not in inventory the user will have the option to click the create Parts button to generate those parts in Global Shop.  If the BOM exists in Global shop then any differences on the new import will be highlighted in Red.  After the Parts have been created then the Upload button will upload and override any previous BOM for that part.
+Program.Sub.Comments.End
